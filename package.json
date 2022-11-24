@@ -1,0 +1,21 @@
+{
+	"name": "ts-lambda-whosthat",
+	"description": "",
+	"main": "dist/app.js",
+	"author": "zS1L3NT <zechariahtan144@gmail.com> (https://www.zectan.com)",
+	"scripts": {
+		"start": "node dist/app.js",
+		"dev": "ts-node --files src/app.ts",
+		"build": "tsc"
+	},
+	"dependencies": {
+		"aws-lambda": "^1.0.7",
+		"aws-sdk": "^2.1258.0"
+	},
+	"devDependencies": {
+		"@types/aws-lambda": "^8.10.108",
+		"@types/node": "latest",
+		"ts-node": "latest",
+		"typescript": "latest"
+	}
+}

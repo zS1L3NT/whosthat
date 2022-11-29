@@ -215,19 +215,41 @@ exports.handler = async (event) => {
 				)
 				log("Person detected", { personDetected })
 				if (personDetected) {
-					log("Publishing to SNS topics")
-					const Message = `Person detected in ${area.name
-						} at ${new Date().toString()} while all authorized users' locations are away from the area! Check the image at https://whosthat.s3.amazonaws.com/${object_key}`
+					log("Publishing to SNS topics and DynamoDB")
 					await Promise.all([
 						promisify(sns.publish.bind(sns), {
 							TopicArn:
-								"arn:aws:sns:us-east-1:310474367837:whosthat:f652eb7b-d625-4884-9e4c-d98ac47649ef",
-							Message
+								"arn:aws:sns:us-east-1:310474367837:whosthat",
+							Message: `Person detected in ${area.name
+								} at ${new Date().toString()} while all authorized users' locations are away from the area! Check the image at https://whosthat.s3.amazonaws.com/${object_key}`
 						}),
-						promisify(sns.publish.bind(sns), {
-							TopicArn:
-								"arn:aws:sns:us-east-1:310474367837:whosthat:194d770a-12fa-4700-b829-07ae0aa63ce3",
-							Message
+						promisify(ddb.putItem.bind(ddb), {
+							TableName: "reports",
+							Item: {
+								id: { S: randomUUID() },
+								feed_url: { S: `https://whosthat.s3.amazonaws.com/${object_key}` },
+								area: {
+									M: {
+										id: { S: area.id },
+										name: { S: area.name },
+										location: {
+											M: {
+												latitude: { N: area.location.latitude + "" },
+												longitude: { N: area.location.longitude + "" }
+											}
+										}
+									}
+								},
+								userLocations: {
+									L: userLocations.map(userLocation => ({
+										M: {
+											latitude: { N: userLocation.latitude + "" },
+											longitude: { N: userLocation.longitude + "" }
+										}
+									}))
+								},
+								timestamp: { N: Date.now() + "" }
+							}
 						})
 					])
 				}

@@ -15,7 +15,7 @@ import type {
 	UpdateItemInput,
 	UpdateItemOutput
 } from "aws-sdk/clients/dynamodb"
-import type { S3CreateEvent } from "aws-lambda"
+import type { AttributeValue, S3CreateEvent } from "aws-lambda"
 type IotLocationEvent = {
 	user_id: string
 	location: {
@@ -236,20 +236,41 @@ export const handler = async (event: S3CreateEvent | IotLocationEvent) => {
 				)
 				log("Person detected", { personDetected })
 				if (personDetected) {
-					log("Publishing to SNS topics")
-					const Message = `Person detected in ${
-						area.name
-					} at ${new Date().toString()} while all authorized users' locations are away from the area! Check the image at https://whosthat.s3.amazonaws.com/${object_key}`
+					log("Publishing to SNS topics and DynamoDB")
 					await Promise.all([
 						promisify<PublishInput, PublishResponse>(sns.publish.bind(sns), {
-							TopicArn:
-								"arn:aws:sns:us-east-1:310474367837:whosthat:f652eb7b-d625-4884-9e4c-d98ac47649ef",
-							Message
+							TopicArn: "arn:aws:sns:us-east-1:310474367837:whosthat",
+							Message: `Person detected in ${
+								area.name
+							} at ${new Date().toString()} while all authorized users' locations are away from the area! Check the image at https://whosthat.s3.amazonaws.com/${object_key}`
 						}),
-						promisify<PublishInput, PublishResponse>(sns.publish.bind(sns), {
-							TopicArn:
-								"arn:aws:sns:us-east-1:310474367837:whosthat:194d770a-12fa-4700-b829-07ae0aa63ce3",
-							Message
+						promisify<PutItemInput, PutItemOutput>(ddb.putItem.bind(ddb), {
+							TableName: "reports",
+							Item: {
+								id: { S: randomUUID() },
+								feed_url: { S: `https://whosthat.s3.amazonaws.com/${object_key}` },
+								area: {
+									M: {
+										id: { S: area.id },
+										name: { S: area.name },
+										location: {
+											M: {
+												latitude: { N: area.location.latitude + "" },
+												longitude: { N: area.location.longitude + "" }
+											}
+										}
+									}
+								},
+								userLocations: {
+									L: userLocations.map<AttributeValue>(userLocation => ({
+										M: {
+											latitude: { N: userLocation.latitude + "" },
+											longitude: { N: userLocation.longitude + "" }
+										}
+									}))
+								},
+								timestamp: { N: Date.now() + "" }
+							}
 						})
 					])
 				}

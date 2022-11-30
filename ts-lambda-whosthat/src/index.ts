@@ -15,7 +15,7 @@ import type {
 	UpdateItemInput,
 	UpdateItemOutput
 } from "aws-sdk/clients/dynamodb"
-import type { AttributeValue, S3CreateEvent } from "aws-lambda"
+import type { APIGatewayEvent, AttributeValue, S3CreateEvent } from "aws-lambda"
 type IotLocationEvent = {
 	user_id: string
 	location: {
@@ -45,7 +45,7 @@ const log = (title: string, data?: any) => {
 	}
 }
 
-export const handler = async (event: S3CreateEvent | IotLocationEvent) => {
+export const handler = async (event: S3CreateEvent | APIGatewayEvent | IotLocationEvent) => {
 	const area_ids = <string[]>[]
 	let data: any
 
@@ -84,7 +84,7 @@ export const handler = async (event: S3CreateEvent | IotLocationEvent) => {
 			)
 		)
 		log("Stored location of user into all areas", { area_ids })
-	} else {
+	} else if ("Records" in event) {
 		// S3 Create Camera Feed Event
 		log(">> S3 Create Camera Feed Event", event)
 		const record = event.Records[0]!
@@ -154,6 +154,62 @@ export const handler = async (event: S3CreateEvent | IotLocationEvent) => {
 					camera_id,
 					object_key: record.s3.object.key,
 					timestamp
+				})
+			}
+		}
+	} else {
+		// API Gateway Event
+		log(">> API Gateway Event", event)
+		const body = JSON.parse(event.body!)
+		log("Body", body)
+
+		if ("area_id" in body) {
+			log("Area ID in body", body.area_id)
+			data = await promisify<ScanInput, ScanOutput>(ddb.scan.bind(ddb), {
+				TableName: "reports",
+				FilterExpression: "area_id = :area_id",
+				ExpressionAttributeValues: {
+					":area_id": { S: body.area_id }
+				}
+			})
+
+			const reports = (<ScanOutput>data)
+				.Items!.sort((a, b) => +b.timestamp!.N! - +a.timestamp!.N!)
+				.map(item => ({
+					id: item.id!.S!,
+					feed_url: item.feed_url!.S!,
+					area: {
+						id: item.area!.M!.id!.S!,
+						name: item.area!.M!.name!.S!,
+						location: {
+							latitude: +item.area!.M!.location!.M!.latitude!.N!,
+							longitude: +item.area!.M!.location!.M!.longitude!.N!
+						}
+					},
+					userLocations: item.userLocations!.L!.map(ul => ({
+						latitude: +ul!.M!.latitude!.N!,
+						longitude: +ul!.M!.longitude!.N!
+					})),
+					timestamp: +item.timestamp!.N!
+				}))
+			log("Reports", reports)
+
+			return {
+				headers: {
+					"Content-Type": "application/json"
+				},
+				statusCode: "200",
+				body: JSON.stringify(reports)
+			}
+		} else {
+			log("No area_id found in request body")
+			return {
+				headers: {
+					"Content-Type": "application/json"
+				},
+				statusCode: "400",
+				body: JSON.stringify({
+					message: "Missing area_id in body"
 				})
 			}
 		}

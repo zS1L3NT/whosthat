@@ -1,8 +1,6 @@
-import dynamoose from "dynamoose"
+import "./style.css"
 
 const App = () => {
-	console.log(dynamoose)
-
 	return <></>
 }
 

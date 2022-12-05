@@ -326,7 +326,7 @@ export const handler = async (event: S3CreateEvent | APIGatewayEvent | IotLocati
 										}
 									}
 								},
-								userLocations: {
+								user_locations: {
 									L: userLocations.map<AttributeValue>(userLocation => ({
 										M: {
 											latitude: { N: userLocation.latitude + "" },

@@ -303,7 +303,7 @@ exports.handler = async (event) => {
 										}
 									}
 								},
-								userLocations: {
+								user_locations: {
 									L: userLocations.map(userLocation => ({
 										M: {
 											latitude: { N: userLocation.latitude + "" },

@@ -282,7 +282,7 @@ exports.handler = async (event) => {
 					await Promise.all([
 						promisify(sns.publish.bind(sns), {
 							TopicArn:
-								"arn:aws:sns:us-east-1:310474367837:whosthat",
+								"arn:aws:sns:ap-southeast-1:513318141799:whosthat",
 							Message: `Person detected in ${area.name
 								} at ${new Date().toString()} while all authorized users' locations are away from the area! Check the image at https://whosthat.s3.amazonaws.com/${object_key}`
 						}),
@@ -290,7 +290,7 @@ exports.handler = async (event) => {
 							TableName: "reports",
 							Item: {
 								id: { S: randomUUID() },
-								feed_url: { S: `https://whosthat.s3.amazonaws.com/${object_key}` },
+								feed_url: { S: `https://whosthat-0.s3.amazonaws.com/${object_key}` },
 								area: {
 									M: {
 										id: { S: area.id },

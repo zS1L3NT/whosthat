@@ -25,4 +25,4 @@ const AreaModel = dynamoose.model<Area>("Area", AreaSchema)
 
 new dynamoose.Table("areas", [AreaModel])
 
-export default AreaModel
+export { Area, AreaModel }

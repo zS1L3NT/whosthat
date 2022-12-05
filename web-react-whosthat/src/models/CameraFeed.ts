@@ -21,4 +21,4 @@ const CameraFeedModel = dynamoose.model<CameraFeed>("CameraFeed", CameraFeedSche
 
 new dynamoose.Table("camera_feeds", [CameraFeedModel])
 
-export default CameraFeedModel
+export { CameraFeed, CameraFeedModel }

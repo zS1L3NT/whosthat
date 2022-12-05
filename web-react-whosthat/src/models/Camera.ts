@@ -15,4 +15,4 @@ const CameraModel = dynamoose.model<Camera>("Camera", CameraSchema)
 
 new dynamoose.Table("cameras", [CameraModel])
 
-export default CameraModel
+export { Camera, CameraModel }

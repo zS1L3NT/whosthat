@@ -29,4 +29,4 @@ const UserLocationModel = dynamoose.model<UserLocation>("UserLocation", UserLoca
 
 new dynamoose.Table("user_locations", [UserLocationModel])
 
-export default UserLocationModel
+export { UserLocation, UserLocationModel }

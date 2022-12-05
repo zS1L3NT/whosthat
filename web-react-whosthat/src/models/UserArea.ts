@@ -17,4 +17,4 @@ const UserAreaModel = dynamoose.model<UserArea>("UserArea", UserAreaSchema)
 
 new dynamoose.Table("users_areas", [UserAreaModel])
 
-export default UserAreaModel
+export { UserArea, UserAreaModel }

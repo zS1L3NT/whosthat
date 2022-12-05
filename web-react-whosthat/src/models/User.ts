@@ -17,4 +17,4 @@ const UserModel = dynamoose.model<User>("User", UserSchema)
 
 new dynamoose.Table("users", [UserModel])
 
-export default UserModel
+export { User, UserModel }

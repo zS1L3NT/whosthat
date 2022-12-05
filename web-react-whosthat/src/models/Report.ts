@@ -37,4 +37,4 @@ const ReportModel = dynamoose.model<Report>("Report", ReportSchema)
 
 new dynamoose.Table("reports", [ReportModel])
 
-export default ReportModel
+export { Report, ReportModel }

@@ -5,6 +5,9 @@
 		},
 		{
 			"path": "ts-lambda-whosthat"
+		},
+		{
+			"path": "."
 		}
 	],
 	"settings": {}

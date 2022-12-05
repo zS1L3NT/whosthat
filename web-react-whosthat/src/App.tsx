@@ -1,7 +1,20 @@
 import "./style.css"
 
+import { Route, Routes } from "react-router-dom"
+
+import Landing from "./features/landing/pages/Landing"
+
 const App = () => {
-	return <></>
+	return (
+		<>
+			<Routes>
+				<Route
+					path="/"
+					element={<Landing />}
+				/>
+			</Routes>
+		</>
+	)
 }
 
 export default App

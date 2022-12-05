@@ -1,5 +1,6 @@
 import dynamoose from "dynamoose"
 import { createRoot } from "react-dom/client"
+import { BrowserRouter } from "react-router-dom"
 
 import { CssBaseline, ThemeProvider } from "@mui/material"
 
@@ -11,14 +12,16 @@ dynamoose.aws.ddb.set(
 		region: import.meta.env.VITE_AWS_REGION,
 		credentials: {
 			accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY,
-			secretAccessKey: import.meta.env.VITE_AWS_SECRET_KEY
+			secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY
 		}
 	})
 )
 
 createRoot(document.getElementById("root") as HTMLElement).render(
-	<ThemeProvider theme={theme}>
-		<CssBaseline />
-		<App />
-	</ThemeProvider>
+	<BrowserRouter>
+		<ThemeProvider theme={theme}>
+			<CssBaseline />
+			<App />
+		</ThemeProvider>
+	</BrowserRouter>
 )

@@ -1,10 +1,13 @@
 {
 	"folders": [
 		{
+			"path": "ts-lambda-whosthat"
+		},
+		{
 			"path": "dart-flutter-whosthat"
 		},
 		{
-			"path": "ts-lambda-whosthat"
+			"path": "web-react-whosthat"
 		},
 		{
 			"path": "."

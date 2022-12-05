@@ -138,7 +138,14 @@ exports.handler = async (event) => {
 	} else {
 		// API Gateway Event
 		log(">> API Gateway Event", event)
-		const body = JSON.parse(event.body)
+
+		let body = {}
+		try {
+			body = JSON.parse(event.body) || {}
+		} catch {
+			log("Invalid JSON body", event.body)
+			body = {}
+		}
 		log("Body", body)
 
 		if ("area_id" in body) {

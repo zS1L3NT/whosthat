@@ -160,7 +160,14 @@ export const handler = async (event: S3CreateEvent | APIGatewayEvent | IotLocati
 	} else {
 		// API Gateway Event
 		log(">> API Gateway Event", event)
-		const body = JSON.parse(event.body!)
+
+		let body: any = {}
+		try {
+			body = JSON.parse(event.body!) || {}
+		} catch {
+			log("Invalid JSON body", event.body)
+			body = {}
+		}
 		log("Body", body)
 
 		if ("area_id" in body) {

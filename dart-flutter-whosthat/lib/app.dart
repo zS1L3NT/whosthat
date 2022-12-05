@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:aws_iot_data_api/iot-data-2015-05-28.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:whosthat/env.dart';
 
 class App extends StatefulWidget {
   const App({
@@ -29,7 +30,7 @@ class _AppState extends State<App> {
   void getReports() async {
     try {
       final response = await post(
-        Uri.parse(""),
+        Uri.parse(Env.AWS_LAMBDA_URL),
         headers: {
           "Content-Type": "application/json",
         },

@@ -4,3 +4,4 @@ linter:
     rules:
         sort_pub_dependencies: true
         avoid_print: false
+        constant_identifier_names: false

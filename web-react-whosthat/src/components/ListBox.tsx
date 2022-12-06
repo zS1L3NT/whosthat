@@ -10,12 +10,16 @@ const ListBox = <T extends { id: string; primary: string; secondary?: string }>(
 	onClick
 }: {
 	title: string
-	icon: JSX.Element | null
+	icon: JSX.Element
 	data: T[] | null | undefined
 	onClick: (item: T) => void
 }) => {
 	return (
-		<Paper sx={{ width: 360 }}>
+		<Paper
+			sx={{
+				width: 360,
+				m: 4
+			}}>
 			<Typography
 				variant="h6"
 				m={2}>
@@ -23,7 +27,7 @@ const ListBox = <T extends { id: string; primary: string; secondary?: string }>(
 			</Typography>
 			<Divider />
 			{!!data ? (
-				<List>
+				<List sx={{ height: 500 }}>
 					{data.map(item => (
 						<ListItem
 							key={item.id}
@@ -42,12 +46,16 @@ const ListBox = <T extends { id: string; primary: string; secondary?: string }>(
 			) : (
 				<Box
 					sx={{
-						padding: 2,
-						display: "flex",
-						justifyContent: "center",
-						alignItems: "center"
+						height: 500,
+						padding: 3
 					}}>
-					<CircularProgress size={30} />
+					<CircularProgress
+						sx={{
+							margin: "auto",
+							display: "block"
+						}}
+						size={30}
+					/>
 				</Box>
 			)}
 		</Paper>

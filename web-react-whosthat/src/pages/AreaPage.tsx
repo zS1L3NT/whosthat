@@ -5,6 +5,7 @@ import PersonIcon from "@mui/icons-material/Person"
 import WarningIcon from "@mui/icons-material/Warning"
 
 import Center from "../components/Center"
+import InformationBox from "../components/InformationBox"
 import ListBox from "../components/ListBox"
 import useRefresh from "../hooks/useRefresh"
 import { AreaModel } from "../models/Area"
@@ -34,6 +35,14 @@ const AreaPage = ({}: {}) => {
 
 	return (
 		<Center>
+			<InformationBox
+				title="Area Information"
+				data={{
+					Name: area?.name,
+					Latitude: area?.location.latitude,
+					Longitude: area?.location.longitude
+				}}
+			/>
 			<ListBox
 				title="Reports"
 				data={reports?.map(report => ({

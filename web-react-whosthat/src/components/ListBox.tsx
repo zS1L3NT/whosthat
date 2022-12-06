@@ -17,8 +17,8 @@ const ListBox = <T extends { id: string; primary: string; secondary?: string }>(
 	return (
 		<Paper
 			sx={{
-				width: 360,
-				m: 4
+				width: 320,
+				m: 2
 			}}>
 			<Typography
 				variant="h6"

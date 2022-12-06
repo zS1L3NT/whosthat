@@ -1,5 +1,6 @@
 import { useRef, useState } from "react"
 import { useParams } from "react-router-dom"
+import { uploadFile } from "react-s3"
 import { format } from "timeago.js"
 
 import { Box, Button, CircularProgress } from "@mui/material"
@@ -29,6 +30,7 @@ const AreaCameraPage = ({}: {}) => {
 	const handleChooseFile = () => {
 		if (file) {
 			setFile(null)
+			imageInputRef.current!.value = ""
 		} else {
 			imageInputRef.current?.click()
 		}
@@ -38,6 +40,20 @@ const AreaCameraPage = ({}: {}) => {
 		setLoading(true)
 
 		try {
+			Object.defineProperty(file, "name", {
+				writable: true,
+				value: `${cameraId}-${Date.now()}.jpg`
+			})
+
+			await uploadFile(file, {
+				bucketName: import.meta.env.VITE_AWS_S3_BUCKET,
+				region: import.meta.env.VITE_AWS_REGION,
+				accessKeyId: import.meta.env.VITE_AWS_ACCESS_KEY,
+				secretAccessKey: import.meta.env.VITE_AWS_SECRET_ACCESS_KEY
+			})
+
+			setFile(null)
+			imageInputRef.current!.value = ""
 		} catch (err) {
 			console.error(err)
 		}

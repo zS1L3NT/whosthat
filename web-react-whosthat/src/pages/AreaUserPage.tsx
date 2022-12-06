@@ -3,10 +3,11 @@ import { useParams } from "react-router-dom"
 import { format } from "timeago.js"
 import { v4 } from "uuid"
 
-import { Box, Button, CircularProgress, Divider, Paper, TextField, Typography } from "@mui/material"
+import { Button, CircularProgress, TextField } from "@mui/material"
 
 import Center from "../components/Center"
-import InformationBox from "../components/InformationBox"
+import DetailsBox from "../components/DetailsBox"
+import EmptyBox from "../components/EmptyBox"
 import useRefresh from "../hooks/useRefresh"
 import { AreaModel } from "../models/Area"
 import { UserModel } from "../models/User"
@@ -60,85 +61,80 @@ const AreaUserPage = ({}: {}) => {
 
 	return (
 		<Center>
-			<InformationBox
+			<DetailsBox
 				title="Area Information"
-				data={{
-					ID: area?.id,
-					Name: area?.name,
-					Latitude: area?.location.latitude,
-					Longitude: area?.location.longitude
-				}}
+				items={[
+					{ id: 0, primary: "ID", secondary: area?.id },
+					{ id: 1, primary: "Name", secondary: area?.name },
+					{ id: 2, primary: "Latitude", secondary: area?.location.latitude },
+					{ id: 3, primary: "Longitude", secondary: area?.location.longitude }
+				]}
 			/>
-			<InformationBox
+			<DetailsBox
 				title="User Information"
-				data={{
-					ID: user?.id,
-					Name: user?.name,
-					Email: user?.email,
-					Latitude:
-						latestLocation === null
-							? "..."
-							: latestLocation === undefined
-							? "-"
-							: latestLocation.location.latitude,
-					Longitude:
-						latestLocation === null
-							? "..."
-							: latestLocation === undefined
-							? "-"
-							: latestLocation.location.longitude,
-					"Last Updated Location":
-						latestLocation === null
-							? "..."
-							: latestLocation === undefined
-							? "-"
-							: format(latestLocation.timestamp)
-				}}
+				items={[
+					{ id: 0, primary: "ID", secondary: user?.id },
+					{ id: 1, primary: "Name", secondary: user?.name },
+					{ id: 2, primary: "Email", secondary: user?.email },
+					{
+						id: 3,
+						primary: "Latitude",
+						secondary:
+							latestLocation === null
+								? "..."
+								: latestLocation === undefined
+								? "-"
+								: latestLocation.location.latitude
+					},
+					{
+						id: 4,
+						primary: "Longitude",
+						secondary:
+							latestLocation === null
+								? "..."
+								: latestLocation === undefined
+								? "-"
+								: latestLocation.location.longitude
+					},
+					{
+						id: 5,
+						primary: "Last Updated Location",
+						secondary:
+							latestLocation === null
+								? "..."
+								: latestLocation === undefined
+								? "-"
+								: format(latestLocation.timestamp)
+					}
+				]}
 			/>
-			<Paper
-				sx={{
-					width: 320,
-					m: 2,
-					display: "block"
-				}}>
-				<Typography
+			<EmptyBox title="Add User Location">
+				<TextField
 					sx={{
-						m: 2,
-						display: "inline-block",
-						color: "primary.main"
+						width: "100%",
+						mb: 2
 					}}
-					variant="h6">
-					Add User Location
-				</Typography>
-				<Divider />
-				<Box sx={{ p: 2 }}>
-					<TextField
-						sx={{
-							width: "100%",
-							mb: 2
-						}}
-						type="number"
-						label="Latitude"
-						value={latitude}
-						onChange={e => setLatitude(+e.target.value)}
-					/>
-					<TextField
-						sx={{
-							width: "100%",
-							mb: 2
-						}}
-						type="number"
-						label="Longitude"
-						value={longitude}
-						onChange={e => setLongitude(+e.target.value)}
-					/>
-					<Button
-						variant="outlined"
-						onClick={handleAddUserLocation}>
-						{loading ? <CircularProgress size={24.5} /> : "Add"}
-					</Button>
-				</Box>
-			</Paper>
+					type="number"
+					label="Latitude"
+					value={latitude}
+					onChange={e => setLatitude(+e.target.value)}
+				/>
+				<TextField
+					sx={{
+						width: "100%",
+						mb: 2
+					}}
+					type="number"
+					label="Longitude"
+					value={longitude}
+					onChange={e => setLongitude(+e.target.value)}
+				/>
+				<Button
+					variant="outlined"
+					onClick={handleAddUserLocation}>
+					{loading ? <CircularProgress size={24.5} /> : "Add"}
+				</Button>
+			</EmptyBox>
 		</Center>
 	)
 }

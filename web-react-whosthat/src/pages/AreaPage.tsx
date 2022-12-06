@@ -1,12 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom"
 
-import CameraIcon from "@mui/icons-material/Camera"
-import PersonIcon from "@mui/icons-material/Person"
-import WarningIcon from "@mui/icons-material/Warning"
-
 import Center from "../components/Center"
-import InformationBox from "../components/InformationBox"
-import ListBox from "../components/ListBox"
+import DetailsBox from "../components/DetailsBox"
 import useRefresh from "../hooks/useRefresh"
 import { AreaModel } from "../models/Area"
 import { CameraModel } from "../models/Camera"
@@ -35,43 +30,42 @@ const AreaPage = ({}: {}) => {
 
 	return (
 		<Center>
-			<InformationBox
+			<DetailsBox
 				title="Area Information"
-				data={{
-					ID: area?.id,
-					Name: area?.name,
-					Latitude: area?.location.latitude,
-					Longitude: area?.location.longitude
-				}}
+				items={[
+					{ id: 0, primary: "ID", secondary: area?.id },
+					{ id: 1, primary: "Name", secondary: area?.name },
+					{ id: 2, primary: "Latitude", secondary: area?.location.latitude },
+					{ id: 3, primary: "Longitude", secondary: area?.location.longitude }
+				]}
 			/>
-			<ListBox
+			<DetailsBox
 				title="Reports"
-				data={reports?.map(report => ({
+				items={reports?.map(report => ({
 					id: report.id,
 					primary: new Date(report.timestamp).toLocaleString(),
 					secondary: report.area.name
 				}))}
-				icon={<WarningIcon />}
-				onClick={() => {}}
+				max={true}
 			/>
-			<ListBox
+			<DetailsBox
 				title="Users"
-				data={users?.map(user => ({
+				items={users?.map(user => ({
 					id: user.id,
 					primary: user.name,
 					secondary: user.email
 				}))}
-				icon={<PersonIcon />}
-				onClick={user => navigate(`users/${user.id}`)}
+				onItemClick={user => navigate(`users/${user.id}`)}
+				max={true}
 			/>
-			<ListBox
+			<DetailsBox
 				title="Cameras"
-				data={cameras?.map(camera => ({
+				items={cameras?.map(camera => ({
 					id: camera.id,
 					primary: camera.id
 				}))}
-				icon={<CameraIcon />}
-				onClick={camera => navigate(`cameras/${camera.id}`)}
+				onItemClick={camera => navigate(`cameras/${camera.id}`)}
+				max={true}
 			/>
 		</Center>
 	)

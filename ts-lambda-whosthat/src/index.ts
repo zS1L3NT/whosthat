@@ -312,7 +312,7 @@ export const handler = async (event: S3CreateEvent | APIGatewayEvent | IotLocati
 							Item: {
 								id: { S: randomUUID() },
 								feed_url: {
-									S: `https://whosthat-0.s3.amazonaws.com/${object_key}`
+									S: `https://whosthat.s3.amazonaws.com/${object_key}`
 								},
 								area: {
 									M: {

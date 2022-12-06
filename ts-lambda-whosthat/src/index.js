@@ -290,7 +290,7 @@ exports.handler = async (event) => {
 							TableName: "reports",
 							Item: {
 								id: { S: randomUUID() },
-								feed_url: { S: `https://whosthat-0.s3.amazonaws.com/${object_key}` },
+								feed_url: { S: `https://whosthat.s3.amazonaws.com/${object_key}` },
 								area: {
 									M: {
 										id: { S: area.id },

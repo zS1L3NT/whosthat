@@ -1,22 +1,23 @@
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { useParams } from "react-router-dom"
+import { format } from "timeago.js"
 
-import { Button, CircularProgress } from "@mui/material"
+import { Box, Button, CircularProgress } from "@mui/material"
 
 import Center from "../components/Center"
 import UtilityBox from "../components/UtilityBox"
 import useRefresh from "../hooks/useRefresh"
 import { AreaModel } from "../models/Area"
-import { CameraModel } from "../models/Camera"
 import { CameraFeedModel } from "../models/CameraFeed"
 
 const AreaCameraPage = ({}: {}) => {
 	const { areaId, cameraId } = useParams()
 
+	const imageInputRef = useRef<HTMLInputElement>(null)
+	const [file, setFile] = useState<File | null>(null)
 	const [loading, setLoading] = useState(false)
 
 	const area = useRefresh(() => AreaModel.get(areaId!))
-	const camera = useRefresh(() => CameraModel.get(cameraId!))
 	const cameraFeeds = useRefresh(async () => [
 		...(await CameraFeedModel.scan("cameraId").eq(cameraId!).exec())
 	])
@@ -25,7 +26,24 @@ const AreaCameraPage = ({}: {}) => {
 		? cameraFeeds.sort((a, b) => b.timestamp - a.timestamp)[0]
 		: null
 
-	const handleUploadImage = () => {}
+	const handleChooseFile = () => {
+		if (file) {
+			setFile(null)
+		} else {
+			imageInputRef.current?.click()
+		}
+	}
+
+	const handleUploadImage = async () => {
+		setLoading(true)
+
+		try {
+		} catch (err) {
+			console.error(err)
+		}
+
+		setLoading(false)
+	}
 
 	return (
 		<Center>
@@ -40,18 +58,102 @@ const AreaCameraPage = ({}: {}) => {
 			/>
 			<UtilityBox
 				title="Camera Information"
-				items={[{ id: 0, primary: "ID", secondary: cameraId }]}>
-				<img
-					width="280"
-					src="https://res.cloudinary.com/daily-now/image/upload/f_auto,q_auto/v1/posts/7967e36116070bb645f11a87b1aeb7fe"
-				/>
+				items={[
+					{ id: 0, primary: "ID", secondary: cameraId },
+					{
+						id: 1,
+						primary: "Object Key",
+						secondary:
+							latestFeed === null
+								? "..."
+								: latestFeed === undefined
+								? "-"
+								: latestFeed.object_key
+					},
+					{
+						id: 2,
+						primary: "Last Updated Feed",
+						secondary:
+							latestFeed === null
+								? "..."
+								: latestFeed === undefined
+								? "-"
+								: format(latestFeed.timestamp)
+					}
+				]}>
+				{latestFeed ? (
+					<img
+						width="280"
+						height="157.5"
+						src={"https://whosthat.s3.amazonaws.com/" + latestFeed.object_key}
+					/>
+				) : (
+					<Box
+						sx={{
+							width: 280,
+							height: 157.5,
+
+							borderWidth: 1,
+							borderStyle: "solid",
+							borderColor: "primary.main",
+
+							display: "flex",
+							justifyContent: "center",
+							alignItems: "center"
+						}}>
+						{latestFeed === null ? <CircularProgress size={24} /> : "-"}
+					</Box>
+				)}
 			</UtilityBox>
 			<UtilityBox title="Upload Camera Feed">
+				{file ? (
+					<img
+						width="280"
+						height="157.5"
+						src={URL.createObjectURL(file)}
+					/>
+				) : (
+					<Box
+						sx={{
+							width: 280,
+							height: 157.5,
+
+							borderWidth: 1,
+							borderStyle: "solid",
+							borderColor: "primary.main",
+
+							display: "flex",
+							justifyContent: "center",
+							alignItems: "center"
+						}}>
+						-
+					</Box>
+				)}
 				<Button
+					sx={{
+						mt: 2,
+						display: "block"
+					}}
 					variant="outlined"
-					onClick={handleUploadImage}>
+					onClick={handleChooseFile}>
+					{file ? "Clear File" : "Choose File"}
+				</Button>
+				<Button
+					sx={{
+						mt: 1,
+						display: "block"
+					}}
+					variant="outlined"
+					onClick={handleUploadImage}
+					disabled={!file}>
 					{loading ? <CircularProgress size={24.5} /> : "Upload"}
 				</Button>
+				<input
+					ref={imageInputRef}
+					type="file"
+					onInput={e => setFile(e.currentTarget.files![0] ?? null)}
+					hidden
+				/>
 			</UtilityBox>
 		</Center>
 	)

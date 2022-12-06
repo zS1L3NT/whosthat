@@ -2,8 +2,8 @@ import "./style.css"
 
 import { Route, Routes } from "react-router-dom"
 
-import AreaPage from "./features/area/pages/AreaPage"
-import Landing from "./features/landing/pages/Landing"
+import AreaPage from "./pages/AreaPage"
+import Landing from "./pages/Landing"
 
 const App = () => {
 	return (

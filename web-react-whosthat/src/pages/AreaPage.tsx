@@ -1,11 +1,11 @@
 import { useParams } from "react-router-dom"
 
-import useRefresh from "../../../hooks/useRefresh"
-import { AreaModel } from "../../../models/Area"
-import { CameraModel } from "../../../models/Camera"
-import { ReportModel } from "../../../models/Report"
-import { UserModel } from "../../../models/User"
-import { UserAreaModel } from "../../../models/UserArea"
+import useRefresh from "../hooks/useRefresh"
+import { AreaModel } from "../models/Area"
+import { CameraModel } from "../models/Camera"
+import { ReportModel } from "../models/Report"
+import { UserModel } from "../models/User"
+import { UserAreaModel } from "../models/UserArea"
 
 const AreaPage = ({}: {}) => {
 	const { areaId } = useParams()

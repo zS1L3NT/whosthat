@@ -38,6 +38,7 @@ const AreaPage = ({}: {}) => {
 			<InformationBox
 				title="Area Information"
 				data={{
+					ID: area?.id,
 					Name: area?.name,
 					Latitude: area?.location.latitude,
 					Longitude: area?.location.longitude

@@ -7,11 +7,16 @@ const InformationBox = ({ title, data }: { title: string; data: Record<string, a
 		<Paper
 			sx={{
 				width: 320,
-				m: 2
+				m: 2,
+				display: "block"
 			}}>
 			<Typography
-				variant="h6"
-				m={2}>
+				sx={{
+					m: 2,
+					display: "inline-block",
+					color: "primary.main"
+				}}
+				variant="h6">
 				{title}
 			</Typography>
 			<Divider />
@@ -24,6 +29,7 @@ const InformationBox = ({ title, data }: { title: string; data: Record<string, a
 							<ListItemButton>
 								<ListItemText
 									primary={key}
+									primaryTypographyProps={{ color: "secondary.main" }}
 									secondary={value ?? "..."}
 								/>
 							</ListItemButton>

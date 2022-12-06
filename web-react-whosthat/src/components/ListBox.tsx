@@ -21,8 +21,11 @@ const ListBox = <T extends { id: string; primary: string; secondary?: string }>(
 				m: 2
 			}}>
 			<Typography
-				variant="h6"
-				m={2}>
+				sx={{
+					m: 2,
+					color: "primary.main"
+				}}
+				variant="h6">
 				{title}
 			</Typography>
 			<Divider />
@@ -37,6 +40,7 @@ const ListBox = <T extends { id: string; primary: string; secondary?: string }>(
 								{icon !== null ? <ListItemIcon>{icon}</ListItemIcon> : null}
 								<ListItemText
 									primary={item.primary}
+									primaryTypographyProps={{ color: "secondary.main" }}
 									secondary={item.secondary}
 								/>
 							</ListItemButton>

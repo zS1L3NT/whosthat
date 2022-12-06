@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom"
 
 import Center from "../components/Center"
-import DetailsBox from "../components/DetailsBox"
+import UtilityBox from "../components/UtilityBox"
 import useRefresh from "../hooks/useRefresh"
 import { AreaModel } from "../models/Area"
 
@@ -12,13 +12,15 @@ const Landing = ({}: {}) => {
 
 	return (
 		<Center>
-			<DetailsBox
+			<UtilityBox
 				title="Areas"
-				items={areas?.map(area => ({
-					id: area.id,
-					primary: area.name,
-					secondary: area.id
-				}))}
+				items={
+					areas?.map(area => ({
+						id: area.id,
+						primary: area.name,
+						secondary: area.id
+					})) ?? null
+				}
 				onItemClick={area => navigate("areas/" + area.id)}
 				max={true}
 			/>

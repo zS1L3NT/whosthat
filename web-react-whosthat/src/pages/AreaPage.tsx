@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom"
 
 import Center from "../components/Center"
-import DetailsBox from "../components/DetailsBox"
+import UtilityBox from "../components/UtilityBox"
 import useRefresh from "../hooks/useRefresh"
 import { AreaModel } from "../models/Area"
 import { CameraModel } from "../models/Camera"
@@ -30,7 +30,7 @@ const AreaPage = ({}: {}) => {
 
 	return (
 		<Center>
-			<DetailsBox
+			<UtilityBox
 				title="Area Information"
 				items={[
 					{ id: 0, primary: "ID", secondary: area?.id },
@@ -39,31 +39,37 @@ const AreaPage = ({}: {}) => {
 					{ id: 3, primary: "Longitude", secondary: area?.location.longitude }
 				]}
 			/>
-			<DetailsBox
+			<UtilityBox
 				title="Reports"
-				items={reports?.map(report => ({
-					id: report.id,
-					primary: new Date(report.timestamp).toLocaleString(),
-					secondary: report.area.name
-				}))}
+				items={
+					reports?.map(report => ({
+						id: report.id,
+						primary: new Date(report.timestamp).toLocaleString(),
+						secondary: report.area.name
+					})) ?? null
+				}
 				max={true}
 			/>
-			<DetailsBox
+			<UtilityBox
 				title="Users"
-				items={users?.map(user => ({
-					id: user.id,
-					primary: user.name,
-					secondary: user.email
-				}))}
+				items={
+					users?.map(user => ({
+						id: user.id,
+						primary: user.name,
+						secondary: user.email
+					})) ?? null
+				}
 				onItemClick={user => navigate(`users/${user.id}`)}
 				max={true}
 			/>
-			<DetailsBox
+			<UtilityBox
 				title="Cameras"
-				items={cameras?.map(camera => ({
-					id: camera.id,
-					primary: camera.id
-				}))}
+				items={
+					cameras?.map(camera => ({
+						id: camera.id,
+						primary: camera.id
+					})) ?? null
+				}
 				onItemClick={camera => navigate(`cameras/${camera.id}`)}
 				max={true}
 			/>

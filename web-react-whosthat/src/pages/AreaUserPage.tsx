@@ -6,8 +6,7 @@ import { v4 } from "uuid"
 import { Button, CircularProgress, TextField } from "@mui/material"
 
 import Center from "../components/Center"
-import DetailsBox from "../components/DetailsBox"
-import EmptyBox from "../components/EmptyBox"
+import UtilityBox from "../components/UtilityBox"
 import useRefresh from "../hooks/useRefresh"
 import { AreaModel } from "../models/Area"
 import { UserModel } from "../models/User"
@@ -61,7 +60,7 @@ const AreaUserPage = ({}: {}) => {
 
 	return (
 		<Center>
-			<DetailsBox
+			<UtilityBox
 				title="Area Information"
 				items={[
 					{ id: 0, primary: "ID", secondary: area?.id },
@@ -70,7 +69,7 @@ const AreaUserPage = ({}: {}) => {
 					{ id: 3, primary: "Longitude", secondary: area?.location.longitude }
 				]}
 			/>
-			<DetailsBox
+			<UtilityBox
 				title="User Information"
 				items={[
 					{ id: 0, primary: "ID", secondary: user?.id },
@@ -108,7 +107,7 @@ const AreaUserPage = ({}: {}) => {
 					}
 				]}
 			/>
-			<EmptyBox title="Add User Location">
+			<UtilityBox title="Add User Location">
 				<TextField
 					sx={{
 						width: "100%",
@@ -134,7 +133,7 @@ const AreaUserPage = ({}: {}) => {
 					onClick={handleAddUserLocation}>
 					{loading ? <CircularProgress size={24.5} /> : "Add"}
 				</Button>
-			</EmptyBox>
+			</UtilityBox>
 		</Center>
 	)
 }

@@ -1,10 +1,10 @@
 import { PropsWithChildren } from "react"
 
-import { Box, CircularProgress, List, ListItem, ListItemButton, ListItemText } from "@mui/material"
+import {
+	Box, CircularProgress, Divider, List, ListItem, ListItemButton, ListItemText, Paper, Typography
+} from "@mui/material"
 
-import EmptyBox from "./EmptyBox"
-
-const DetailsBox = <
+const UtilityBox = <
 	T extends {
 		id: string | number
 		primary: string | number
@@ -18,13 +18,44 @@ const DetailsBox = <
 	max
 }: PropsWithChildren<{
 	title: string
-	items: T[] | null | undefined
+	items?: T[] | null
 	onItemClick?: (item: T) => void
 	max?: boolean
 }>) => {
 	return (
-		<EmptyBox title={title}>
-			{!!items ? (
+		<Paper
+			sx={{
+				width: 320,
+				m: 2,
+				display: "block"
+			}}>
+			<Typography
+				sx={{
+					m: 2,
+					display: "inline-block",
+					color: "primary.main"
+				}}
+				variant="h6">
+				{title}
+			</Typography>
+			<Divider />
+			{items === null ? (
+				<Box
+					sx={{
+						height: max ? 500 : undefined,
+						p: 2
+					}}>
+					<CircularProgress
+						sx={{
+							margin: "auto",
+							display: "block"
+						}}
+						size={30}
+					/>
+				</Box>
+			) : items === undefined ? (
+				<></>
+			) : (
 				<List sx={{ height: max ? 500 : undefined }}>
 					{items.map(item => (
 						<ListItem
@@ -43,24 +74,10 @@ const DetailsBox = <
 						</ListItem>
 					))}
 				</List>
-			) : (
-				<Box
-					sx={{
-						height: max ? 500 : undefined,
-						p: 2
-					}}>
-					<CircularProgress
-						sx={{
-							margin: "auto",
-							display: "block"
-						}}
-						size={30}
-					/>
-				</Box>
 			)}
 			{!!children ? <Box sx={{ p: 2 }}>{children}</Box> : null}
-		</EmptyBox>
+		</Paper>
 	)
 }
 
-export default DetailsBox
+export default UtilityBox

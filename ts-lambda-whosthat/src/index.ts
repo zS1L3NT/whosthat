@@ -200,7 +200,10 @@ const handleAPIGatewayEvent = async (body: any): Promise<any> => {
 
 		return {
 			headers: {
-				"Content-Type": "application/json"
+				"Content-Type": "application/json",
+				"Access-Control-Allow-Headers": "*",
+				"Access-Control-Allow-Origin": "*",
+				"Access-Control-Allow-Methods": "*"
 			},
 			statusCode: "200",
 			body: JSON.stringify(reports)
@@ -209,7 +212,10 @@ const handleAPIGatewayEvent = async (body: any): Promise<any> => {
 		log("No area_id found in request body")
 		return {
 			headers: {
-				"Content-Type": "application/json"
+				"Content-Type": "application/json",
+				"Access-Control-Allow-Headers": "*",
+				"Access-Control-Allow-Origin": "*",
+				"Access-Control-Allow-Methods": "*"
 			},
 			statusCode: "400",
 			body: JSON.stringify({
@@ -358,6 +364,19 @@ export const handler = async (event: S3CreateEvent | APIGatewayEvent | IotLocati
 	} else {
 		log(">> API Gateway Event", event)
 
+		if (event.httpMethod === "OPTIONS") {
+			return {
+				headers: {
+					"Content-Type": "application/json",
+					"Access-Control-Allow-Headers": "*",
+					"Access-Control-Allow-Origin": "*",
+					"Access-Control-Allow-Methods": "*"
+				},
+				statusCode: "200",
+				body: JSON.stringify({})
+			}
+		}
+
 		let body: any = {}
 		try {
 			body = JSON.parse(event.body!) || {}
@@ -374,7 +393,10 @@ export const handler = async (event: S3CreateEvent | APIGatewayEvent | IotLocati
 
 			return {
 				headers: {
-					"Content-Type": "application/json"
+					"Content-Type": "application/json",
+					"Access-Control-Allow-Headers": "*",
+					"Access-Control-Allow-Origin": "*",
+					"Access-Control-Allow-Methods": "*"
 				},
 				statusCode: "200",
 				body: JSON.stringify({})

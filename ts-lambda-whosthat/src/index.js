@@ -178,7 +178,10 @@ const handleAPIGatewayEvent = async (body) => {
 
 		return {
 			headers: {
-				"Content-Type": "application/json"
+				"Content-Type": "application/json",
+				"Access-Control-Allow-Headers": "*",
+				"Access-Control-Allow-Origin": "*",
+				"Access-Control-Allow-Methods": "*"
 			},
 			statusCode: "200",
 			body: JSON.stringify(reports)
@@ -187,7 +190,10 @@ const handleAPIGatewayEvent = async (body) => {
 		log("No area_id found in request body")
 		return {
 			headers: {
-				"Content-Type": "application/json"
+				"Content-Type": "application/json",
+				"Access-Control-Allow-Headers": "*",
+				"Access-Control-Allow-Origin": "*",
+				"Access-Control-Allow-Methods": "*"
 			},
 			statusCode: "400",
 			body: JSON.stringify({
@@ -333,6 +339,19 @@ exports.handler = async (event) => {
 	} else {
 		log(">> API Gateway Event", event)
 
+		if (event.httpMethod === "OPTIONS") {
+			return {
+				headers: {
+					"Content-Type": "application/json",
+					"Access-Control-Allow-Headers": "*",
+					"Access-Control-Allow-Origin": "*",
+					"Access-Control-Allow-Methods": "*"
+				},
+				statusCode: "200",
+				body: JSON.stringify({})
+			}
+		}
+
 		let body = {}
 		try {
 			body = JSON.parse(event.body) || {}
@@ -349,7 +368,10 @@ exports.handler = async (event) => {
 
 			return {
 				headers: {
-					"Content-Type": "application/json"
+					"Content-Type": "application/json",
+					"Access-Control-Allow-Headers": "*",
+					"Access-Control-Allow-Origin": "*",
+					"Access-Control-Allow-Methods": "*"
 				},
 				statusCode: "200",
 				body: JSON.stringify({})

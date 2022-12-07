@@ -135,6 +135,14 @@
 ]
 ```
 
+# API Gateway
+
+## Cross-Origin Resource Sharing
+
+**Access-Control-Allow-Origin**: `*`<br>
+**Access-Control-Allow-Headers**: `*`<br>
+**Access-Control-Allow-Methods**: `*`<br>
+
 # Simple Notification Service
 
 ## Topic

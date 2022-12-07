@@ -273,6 +273,7 @@ const processData = async (area_ids) => {
 			}
 		})
 		const userLocations = data.Items.map(item => ({
+			user_id: item.user_id.S,
 			latitude: +item.location.M.latitude.N,
 			longitude: +item.location.M.longitude.N
 		}))
@@ -345,6 +346,7 @@ const processData = async (area_ids) => {
 								user_locations: {
 									L: userLocations.map(userLocation => ({
 										M: {
+											user_id: { S: userLocation.user_id },
 											latitude: { N: userLocation.latitude + "" },
 											longitude: { N: userLocation.longitude + "" }
 										}

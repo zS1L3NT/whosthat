@@ -1,6 +1,6 @@
 import { useDebugValue, useEffect, useState } from "react"
 
-const useRefresh = <T>(refresh: () => Promise<T>): T | null => {
+const useRefresh = <T>(refresh: () => Promise<T>, dependencies: any[] = []): T | null => {
 	const [data, setData] = useState<T | null>(null)
 
 	useDebugValue(data)
@@ -14,7 +14,7 @@ const useRefresh = <T>(refresh: () => Promise<T>): T | null => {
 		return () => {
 			clearInterval(interval)
 		}
-	}, [])
+	}, [...dependencies])
 
 	return data
 }

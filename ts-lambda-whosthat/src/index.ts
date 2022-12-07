@@ -295,6 +295,7 @@ const processData = async (area_ids: string[]) => {
 			}
 		})
 		const userLocations = (<ScanOutput>data).Items!.map(item => ({
+			user_id: item.user_id!.S!,
 			latitude: +item.location!.M!.latitude!.N!,
 			longitude: +item.location!.M!.longitude!.N!
 		}))
@@ -370,6 +371,7 @@ const processData = async (area_ids: string[]) => {
 								user_locations: {
 									L: userLocations.map<AttributeValue>(userLocation => ({
 										M: {
+											user_id: { S: userLocation.user_id },
 											latitude: { N: userLocation.latitude + "" },
 											longitude: { N: userLocation.longitude + "" }
 										}

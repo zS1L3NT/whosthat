@@ -18,7 +18,7 @@ class Report extends Item {
 			longitude: 0
 		}
 	}
-	user_locations: Location[] = []
+	user_locations: (Location & { user_id: string })[] = []
 	timestamp = 0
 }
 

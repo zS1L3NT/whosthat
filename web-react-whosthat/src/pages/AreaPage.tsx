@@ -42,12 +42,15 @@ const AreaPage = ({}: {}) => {
 			<UtilityBox
 				title="Reports"
 				items={
-					reports?.map(report => ({
-						id: report.id,
-						primary: new Date(report.timestamp).toLocaleString(),
-						secondary: report.area.name
-					})) ?? null
+					reports
+						?.sort((a, b) => b.timestamp - a.timestamp)
+						.map(report => ({
+							id: report.id,
+							primary: new Date(report.timestamp).toLocaleString(),
+							secondary: report.area.name
+						})) ?? null
 				}
+				onItemClick={report => navigate(`reports/${report.id}`)}
 				max={true}
 			/>
 			<UtilityBox

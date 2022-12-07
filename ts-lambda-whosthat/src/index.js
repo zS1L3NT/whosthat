@@ -262,7 +262,7 @@ const processData = async (area_ids) => {
 					{
 						Image: {
 							S3Object: {
-								Bucket: "whosthat",
+								Bucket: process.env.AWS_S3_BUCKET,
 								Name: object_key
 							}
 						}
@@ -280,16 +280,16 @@ const processData = async (area_ids) => {
 					log("Publishing to SNS topics and DynamoDB")
 					await Promise.all([
 						promisify(sns.publish.bind(sns), {
-							TopicArn: "arn:aws:sns:ap-southeast-1:513318141799:whosthat",
+							TopicArn: process.env.AWS_SNS_TOPIC_ARN,
 							Message: `Person detected in ${area.name
-								} at ${new Date().toString()} while all authorized users' locations are away from the area Check the image at https://whosthat.s3.amazonaws.com/${object_key}`
+								} at ${new Date().toString()} while all authorized users' locations are away from the area Check the image at https://${process.env.AWS_S3_BUCKET}.s3.amazonaws.com/${object_key}`
 						}),
 						promisify(ddb.putItem.bind(ddb), {
 							TableName: "reports",
 							Item: {
 								id: { S: randomUUID() },
 								feed_url: {
-									S: `https://whosthat.s3.amazonaws.com/${object_key}`
+									S: `https://${process.env.AWS_S3_BUCKET}.s3.amazonaws.com/${object_key}`
 								},
 								area: {
 									M: {

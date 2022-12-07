@@ -215,6 +215,7 @@ const handleAPIGatewayEvent = async (body: any): Promise<any> => {
 			.map(item => ({
 				id: item.id!.S!,
 				feed_url: item.feed_url!.S!,
+				area_id: item.area_id!.S!,
 				area: {
 					id: item.area!.M!.id!.S!,
 					name: item.area!.M!.name!.S!,
@@ -356,6 +357,7 @@ const processData = async (area_ids: string[]) => {
 								feed_url: {
 									S: `https://${process.env.AWS_S3_BUCKET}.s3.amazonaws.com/${object_key}`
 								},
+								area_id: { S: area_id },
 								area: {
 									M: {
 										id: { S: area.id },

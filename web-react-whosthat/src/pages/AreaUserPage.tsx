@@ -21,12 +21,12 @@ const AreaUserPage = ({}: {}) => {
 
 	const area = useRefresh(() => AreaModel.get(areaId!))
 	const user = useRefresh(() => UserModel.get(userId!))
-	const userLocations = useRefresh(async () => [
+	const user_locations = useRefresh(async () => [
 		...(await UserLocationModel.scan({ user_id: userId!, area_id: areaId! }).exec())
 	])
 
-	const latestLocation = !!userLocations
-		? userLocations.sort((a, b) => b.timestamp - a.timestamp)[0]
+	const latestLocation = !!user_locations
+		? user_locations.sort((a, b) => b.timestamp - a.timestamp)[0]
 		: null
 
 	useEffect(() => {

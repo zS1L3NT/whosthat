@@ -6,6 +6,7 @@ import { Location } from "../@types/types"
 class Report extends Item {
 	id = ""
 	feed_url = ""
+	area_id = ""
 	area: {
 		id: string
 		name: string
@@ -26,6 +27,7 @@ const ReportSchema = new dynamoose.Schema(
 	{
 		id: String,
 		feed_url: String,
+		area_id: String,
 		area: Object,
 		user_locations: Array,
 		timestamp: Number

@@ -74,12 +74,12 @@ const handleLocationEvent = async (event: IotLocationEvent): Promise<string[]> =
 	// Store location into all areas
 	await Promise.all(
 		area_ids.map(async area_id => {
-			const userLocationId = user_locations.find(ul => ul.area_id!.S! === area_id)?.id?.S
-			if (userLocationId) {
+			const user_location_id = user_locations.find(ul => ul.area_id!.S! === area_id)?.id?.S
+			if (user_location_id) {
 				await promisify<UpdateItemInput, UpdateItemOutput>(ddb.updateItem.bind(ddb), {
 					TableName: "user_locations",
 					Key: {
-						id: { S: userLocationId }
+						id: { S: user_location_id }
 					},
 					AttributeUpdates: {
 						location: {
@@ -215,6 +215,7 @@ const handleAPIGatewayEvent = async (body: any): Promise<any> => {
 			.map(item => ({
 				id: item.id!.S!,
 				feed_url: item.feed_url!.S!,
+				area_id: item.area_id!.S!,
 				area: {
 					id: item.area!.M!.id!.S!,
 					name: item.area!.M!.name!.S!,
@@ -223,7 +224,7 @@ const handleAPIGatewayEvent = async (body: any): Promise<any> => {
 						longitude: +item.area!.M!.location!.M!.longitude!.N!
 					}
 				},
-				userLocations: item.userLocations!.L!.map(ul => ({
+				user_locations: item.user_locations!.L!.map(ul => ({
 					latitude: +ul!.M!.latitude!.N!,
 					longitude: +ul!.M!.longitude!.N!
 				})),
@@ -294,17 +295,15 @@ const processData = async (area_ids: string[]) => {
 				":timestamp": { N: Date.now() - 5 * 60 * 1000 + "" }
 			}
 		})
-		const userLocations = (<ScanOutput>data).Items!.map(item => ({
+		const user_locations = (<ScanOutput>data).Items!.map(item => ({
 			user_id: item.user_id!.S!,
 			latitude: +item.location!.M!.latitude!.N!,
 			longitude: +item.location!.M!.longitude!.N!
 		}))
-		log("User locations", { userLocations })
+		log("User locations", { user_locations })
 
 		// Calculate if all users are >10m away from area
-		const allUsersAway = userLocations.every(
-			userLocation => distancediff(userLocation, area.location) > 10
-		)
+		const allUsersAway = user_locations.every(ul => distancediff(ul, area.location) > 10)
 		log("All users away", { allUsersAway })
 		if (allUsersAway) {
 			// User Rekognition to detect human in image
@@ -356,6 +355,7 @@ const processData = async (area_ids: string[]) => {
 								feed_url: {
 									S: `https://${process.env.AWS_S3_BUCKET}.s3.amazonaws.com/${object_key}`
 								},
+								area_id: { S: area_id },
 								area: {
 									M: {
 										id: { S: area.id },
@@ -369,11 +369,11 @@ const processData = async (area_ids: string[]) => {
 									}
 								},
 								user_locations: {
-									L: userLocations.map<AttributeValue>(userLocation => ({
+									L: user_locations.map<AttributeValue>(ul => ({
 										M: {
-											user_id: { S: userLocation.user_id },
-											latitude: { N: userLocation.latitude + "" },
-											longitude: { N: userLocation.longitude + "" }
+											user_id: { S: ul.user_id },
+											latitude: { N: ul.latitude + "" },
+											longitude: { N: ul.longitude + "" }
 										}
 									}))
 								},

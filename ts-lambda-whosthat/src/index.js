@@ -39,25 +39,58 @@ const handleLocationEvent = async (event) => {
 	area_ids.push(...data.Items.map(item => item.area_id.S))
 	log("Area IDs for locations connected to user", { area_ids })
 
+	data = await promisify(ddb.scan.bind(ddb), {
+		TableName: "user_locations",
+		FilterExpression: "user_id = :user_id",
+		ExpressionAttributeValues: {
+			":user_id": { S: event.user_id }
+		},
+	})
+	const user_locations = data.Items ?? []
+	log("User locations", { user_locations })
+
 	// Store location into all areas
 	await Promise.all(
-		area_ids.map(async area_id =>
-			promisify(ddb.putItem.bind(ddb), {
-				TableName: "user_locations",
-				Item: {
-					id: { S: randomUUID() },
-					user_id: { S: event.user_id },
-					area_id: { S: area_id },
-					location: {
-						M: {
-							latitude: { N: event.location.latitude + "" },
-							longitude: { N: event.location.longitude + "" }
-						}
+		area_ids.map(async area_id => {
+			const userLocationId = user_locations.find(ul => ul.area_id.S === area_id)?.id?.S
+			if (userLocationId) {
+				await promisify(ddb.updateItem.bind(ddb), {
+					TableName: "user_locations",
+					Key: {
+						id: { S: userLocationId }
 					},
-					timestamp: { N: Date.now() + "" }
-				}
-			})
-		)
+					AttributeUpdates: {
+						location: {
+							Value: {
+								M: {
+									latitude: { N: event.location.latitude + "" },
+									longitude: { N: event.location.longitude + "" }
+								}
+							}
+						},
+						timestamp: {
+							Value: { N: Date.now() + "" }
+						}
+					}
+				})
+			} else {
+				await promisify(ddb.putItem.bind(ddb), {
+					TableName: "user_locations",
+					Item: {
+						id: { S: randomUUID() },
+						user_id: { S: event.user_id },
+						area_id: { S: area_id },
+						location: {
+							M: {
+								latitude: { N: event.location.latitude + "" },
+								longitude: { N: event.location.longitude + "" }
+							}
+						},
+						timestamp: { N: Date.now() + "" }
+					}
+				})
+			}
+		})
 	)
 	log("Stored location of user into all areas", { area_ids })
 

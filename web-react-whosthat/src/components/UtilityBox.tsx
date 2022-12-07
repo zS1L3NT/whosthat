@@ -60,7 +60,13 @@ const UtilityBox = <
 					{items.map(item => (
 						<ListItem
 							key={item.id}
-							onClick={() => onItemClick?.(item)}
+							onClick={() =>
+								onItemClick
+									? onItemClick(item)
+									: !!item.secondary
+									? navigator.clipboard.writeText(item.secondary!.toString())
+									: null
+							}
 							disablePadding>
 							<ListItemButton>
 								<ListItemText

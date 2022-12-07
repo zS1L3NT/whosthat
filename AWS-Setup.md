@@ -1,3 +1,15 @@
+# IAM
+
+## Role
+
+**Trusted entity type**: `AWS Service`<br>
+**Use case**: `Lambda`<br>
+**Permissions policies**:<br>
+
+1.  **Policy name**: `AdministratorAccess`<br>
+
+**Role name**: `whosthat`
+
 # IoT Core
 
 ## Thing
@@ -41,7 +53,8 @@
 **Function name**: `whosthat`<br>
 **Runtime**: `Node.js 16.x`<br>
 **Architecture**: `x86_64`<br>
-**Execution role**: `Create a new role with basic Lambda permissions`
+**Execution role**: `Use an existing role`
+**Existing role**: [`whosthat`](#role)
 
 ### Triggers
 
@@ -89,28 +102,23 @@
 ## Bucket
 
 **Bucket name**: `whosthat`<br>
+**Object Ownership**: `ACLs enabled (Bucket owner preferred)`<br>
 **Block Public Access settings for this bucket**: `Disable all 5 checkboxes`
 
 ### Bucket policy
 
 ```json
 {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "PublicListGet",
-            "Effect": "Allow",
-            "Principal": "*",
-            "Action": [
-                "s3:List*",
-                "s3:Get*"
-            ],
-            "Resource": [
-                "arn:aws:s3:::whosthat",
-                "arn:aws:s3:::whosthat/*"
-            ]
-        }
-    ]
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Sid": "whosthat",
+			"Effect": "Allow",
+			"Principal": "*",
+			"Action": ["s3:*"],
+			"Resource": ["arn:aws:s3:::whosthat", "arn:aws:s3:::whosthat/*"]
+		}
+	]
 }
 ```
 
@@ -118,21 +126,12 @@
 
 ```json
 [
-    {
-        "AllowedHeaders": [
-            "*"
-        ],
-        "AllowedMethods": [
-            "PUT",
-            "POST",
-            "DELETE",
-            "GET"
-        ],
-        "AllowedOrigins": [
-            "*"
-        ],
-        "ExposeHeaders": []
-    }
+	{
+		"AllowedHeaders": ["*"],
+		"AllowedMethods": ["PUT", "POST", "DELETE", "GET"],
+		"AllowedOrigins": ["*"],
+		"ExposeHeaders": []
+	}
 ]
 ```
 

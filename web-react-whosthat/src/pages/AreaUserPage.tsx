@@ -1,7 +1,7 @@
+import axios from "axios"
 import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import { format } from "timeago.js"
-import { v4 } from "uuid"
 
 import { Button, CircularProgress, TextField } from "@mui/material"
 
@@ -41,15 +41,12 @@ const AreaUserPage = ({}: {}) => {
 
 		setLoading(true)
 		try {
-			await UserLocationModel.create({
-				id: v4(),
+			await axios.post(import.meta.env.VITE_API_GATEWAY_ENDPOINT, {
 				user_id: userId!,
-				area_id: areaId!,
 				location: {
 					latitude,
 					longitude
-				},
-				timestamp: Date.now()
+				}
 			})
 		} catch (err) {
 			console.error(err)

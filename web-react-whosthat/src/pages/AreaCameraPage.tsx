@@ -20,7 +20,7 @@ const AreaCameraPage = ({}: {}) => {
 
 	const area = useRefresh(() => AreaModel.get(areaId!))
 	const cameraFeeds = useRefresh(async () => [
-		...(await CameraFeedModel.scan("cameraId").eq(cameraId!).exec())
+		...(await CameraFeedModel.scan("camera_id").eq(cameraId!).exec())
 	])
 
 	const latestFeed = !!cameraFeeds
@@ -155,10 +155,7 @@ const AreaCameraPage = ({}: {}) => {
 					{file ? "Clear File" : "Choose File"}
 				</Button>
 				<Button
-					sx={{
-						mt: 1,
-						display: "block"
-					}}
+					sx={{ mt: 1 }}
 					variant="outlined"
 					onClick={handleUploadImage}
 					disabled={!file}>

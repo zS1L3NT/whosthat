@@ -45,28 +45,58 @@ const log = (title: string, data?: any) => {
 	}
 }
 
-export const handler = async (event: S3CreateEvent | APIGatewayEvent | IotLocationEvent) => {
-	const area_ids = <string[]>[]
+const handleLocationEvent = async (event: IotLocationEvent): Promise<string[]> => {
 	let data: any
+	const area_ids = <string[]>[]
 
-	if ("location" in event) {
-		// IOT Core Location Event
-		log(">> IoT Location Event", event)
-		data = await promisify<ScanInput, ScanOutput>(ddb.scan.bind(ddb), {
-			TableName: "users_areas",
-			FilterExpression: "user_id = :user_id",
-			ExpressionAttributeValues: {
-				":user_id": { S: event.user_id }
-			}
-		})
+	log(">> IoT Location Event", event)
+	data = await promisify<ScanInput, ScanOutput>(ddb.scan.bind(ddb), {
+		TableName: "users_areas",
+		FilterExpression: "user_id = :user_id",
+		ExpressionAttributeValues: {
+			":user_id": { S: event.user_id }
+		}
+	})
 
-		area_ids.push(...(<ScanOutput>data).Items!.map(item => item.area_id!.S!))
-		log("Area IDs for locations connected to user", { area_ids })
+	area_ids.push(...(<ScanOutput>data).Items!.map(item => item.area_id!.S!))
+	log("Area IDs for locations connected to user", { area_ids })
 
-		// Store location into all areas
-		await Promise.all(
-			area_ids.map(async area_id =>
-				promisify<PutItemInput, PutItemOutput>(ddb.putItem.bind(ddb), {
+	data = await promisify<ScanInput, ScanOutput>(ddb.scan.bind(ddb), {
+		TableName: "user_locations",
+		FilterExpression: "user_id = :user_id",
+		ExpressionAttributeValues: {
+			":user_id": { S: event.user_id }
+		}
+	})
+	const user_locations = (<ScanOutput>data).Items ?? []
+	log("User locations", { user_locations })
+
+	// Store location into all areas
+	await Promise.all(
+		area_ids.map(async area_id => {
+			const userLocationId = user_locations.find(ul => ul.area_id!.S! === area_id)?.id?.S
+			if (userLocationId) {
+				await promisify<UpdateItemInput, UpdateItemOutput>(ddb.updateItem.bind(ddb), {
+					TableName: "user_locations",
+					Key: {
+						id: { S: userLocationId }
+					},
+					AttributeUpdates: {
+						location: {
+							Value: {
+								M: {
+									latitude: { N: event.location.latitude + "" },
+									longitude: { N: event.location.longitude + "" }
+								}
+							}
+						},
+						timestamp: {
+							Value: { N: Date.now() + "" }
+						}
+					}
+				})
+			} else {
+				await promisify<PutItemInput, PutItemOutput>(ddb.putItem.bind(ddb), {
 					TableName: "user_locations",
 					Item: {
 						id: { S: randomUUID() },
@@ -81,146 +111,155 @@ export const handler = async (event: S3CreateEvent | APIGatewayEvent | IotLocati
 						timestamp: { N: Date.now() + "" }
 					}
 				})
-			)
-		)
-		log("Stored location of user into all areas", { area_ids })
-	} else if ("Records" in event) {
-		// S3 Create Camera Feed Event
-		log(">> S3 Create Camera Feed Event", event)
-		const record = event.Records[0]!
-		const filenameRegex =
-			/([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})-(\d{13})/
-		const filenameMatch = record.s3.object.key.match(filenameRegex)
+			}
+		})
+	)
+	log("Stored location of user into all areas", { area_ids })
 
-		log("Filename match", filenameMatch)
-		if (filenameMatch) {
-			const [camera_id, timestamp] = filenameMatch.slice(1) as [string, string]
-			log("Filename match found", { camera_id, timestamp })
+	return area_ids
+}
 
-			// Get area_id of camera
-			data = await promisify<GetItemInput, GetItemOutput>(ddb.getItem.bind(ddb), {
-				TableName: "cameras",
-				Key: {
-					id: { S: camera_id }
-				}
-			})
-			const area_id = (<GetItemOutput>data).Item!.area_id!.S!
-			log("Area ID of camera", { area_id })
+const handleS3CreateEvent = async (event: S3CreateEvent): Promise<string[]> => {
+	let data: any
+	const area_ids = <string[]>[]
 
-			area_ids.push(area_id)
+	log(">> S3 Create Camera Feed Event", event)
+	const record = event.Records[0]!
+	const filenameRegex = /([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})-(\d{13})/
+	const filenameMatch = record.s3.object.key.match(filenameRegex)
 
-			data = await promisify<ScanInput, ScanOutput>(ddb.scan.bind(ddb), {
+	log("Filename match", filenameMatch)
+	if (filenameMatch) {
+		const [camera_id, timestamp] = filenameMatch.slice(1) as [string, string]
+		log("Filename match found", { camera_id, timestamp })
+
+		// Get area_id of camera
+		data = await promisify<GetItemInput, GetItemOutput>(ddb.getItem.bind(ddb), {
+			TableName: "cameras",
+			Key: {
+				id: { S: camera_id }
+			}
+		})
+		const area_id = (<GetItemOutput>data).Item!.area_id!.S!
+		log("Area ID of camera", { area_id })
+
+		area_ids.push(area_id)
+
+		data = await promisify<ScanInput, ScanOutput>(ddb.scan.bind(ddb), {
+			TableName: "camera_feeds",
+			FilterExpression: "camera_id = :camera_id",
+			ExpressionAttributeValues: {
+				":camera_id": { S: camera_id }
+			}
+		})
+		const camera_feed_id = (<ScanOutput>data).Items![0]?.id?.S
+		log("Camera Feed ID of camera", { camera_feed_id })
+
+		if (camera_feed_id) {
+			await promisify<UpdateItemInput, UpdateItemOutput>(ddb.updateItem.bind(ddb), {
 				TableName: "camera_feeds",
-				FilterExpression: "camera_id = :camera_id",
-				ExpressionAttributeValues: {
-					":camera_id": { S: camera_id }
-				}
-			})
-			const camera_feed_id = (<ScanOutput>data).Items![0]?.id?.S
-			log("Camera Feed ID of camera", { camera_feed_id })
-
-			if (camera_feed_id) {
-				await promisify<UpdateItemInput, UpdateItemOutput>(ddb.updateItem.bind(ddb), {
-					TableName: "camera_feeds",
-					Key: {
-						id: { S: camera_feed_id }
-					},
-					AttributeUpdates: {
-						object_key: {
-							Value: { S: record.s3.object.key }
-						},
-						timestamp: {
-							Value: { N: timestamp }
-						}
-					}
-				})
-				log("Updated camera feed by ID", {
-					object_key: record.s3.object.key,
-					timestamp
-				})
-			} else {
-				await promisify<PutItemInput, PutItemOutput>(ddb.putItem.bind(ddb), {
-					TableName: "camera_feeds",
-					Item: {
-						id: { S: randomUUID() },
-						area_id: { S: area_id },
-						camera_id: { S: camera_id },
-						object_key: { S: record.s3.object.key },
-						timestamp: { N: timestamp }
-					}
-				})
-				log("Created camera feed", {
-					area_id,
-					camera_id,
-					object_key: record.s3.object.key,
-					timestamp
-				})
-			}
-		}
-	} else {
-		// API Gateway Event
-		log(">> API Gateway Event", event)
-
-		let body: any = {}
-		try {
-			body = JSON.parse(event.body!) || {}
-		} catch {
-			log("Invalid JSON body", event.body)
-			body = {}
-		}
-		log("Body", body)
-
-		if ("area_id" in body) {
-			log("Area ID in body", body.area_id)
-			data = await promisify<ScanInput, ScanOutput>(ddb.scan.bind(ddb), {
-				TableName: "reports",
-				FilterExpression: "area_id = :area_id",
-				ExpressionAttributeValues: {
-					":area_id": { S: body.area_id }
-				}
-			})
-
-			const reports = (<ScanOutput>data)
-				.Items!.sort((a, b) => +b.timestamp!.N! - +a.timestamp!.N!)
-				.map(item => ({
-					id: item.id!.S!,
-					feed_url: item.feed_url!.S!,
-					area: {
-						id: item.area!.M!.id!.S!,
-						name: item.area!.M!.name!.S!,
-						location: {
-							latitude: +item.area!.M!.location!.M!.latitude!.N!,
-							longitude: +item.area!.M!.location!.M!.longitude!.N!
-						}
-					},
-					userLocations: item.userLocations!.L!.map(ul => ({
-						latitude: +ul!.M!.latitude!.N!,
-						longitude: +ul!.M!.longitude!.N!
-					})),
-					timestamp: +item.timestamp!.N!
-				}))
-			log("Reports", reports)
-
-			return {
-				headers: {
-					"Content-Type": "application/json"
+				Key: {
+					id: { S: camera_feed_id }
 				},
-				statusCode: "200",
-				body: JSON.stringify(reports)
-			}
+				AttributeUpdates: {
+					object_key: {
+						Value: { S: record.s3.object.key }
+					},
+					timestamp: {
+						Value: { N: timestamp }
+					}
+				}
+			})
+			log("Updated camera feed by ID", {
+				object_key: record.s3.object.key,
+				timestamp
+			})
 		} else {
-			log("No area_id found in request body")
-			return {
-				headers: {
-					"Content-Type": "application/json"
-				},
-				statusCode: "400",
-				body: JSON.stringify({
-					message: "Missing area_id in body"
-				})
-			}
+			await promisify<PutItemInput, PutItemOutput>(ddb.putItem.bind(ddb), {
+				TableName: "camera_feeds",
+				Item: {
+					id: { S: randomUUID() },
+					area_id: { S: area_id },
+					camera_id: { S: camera_id },
+					object_key: { S: record.s3.object.key },
+					timestamp: { N: timestamp }
+				}
+			})
+			log("Created camera feed", {
+				area_id,
+				camera_id,
+				object_key: record.s3.object.key,
+				timestamp
+			})
 		}
 	}
+
+	return area_ids
+}
+
+const handleAPIGatewayEvent = async (body: any): Promise<any> => {
+	let data: any
+
+	if ("area_id" in body) {
+		log("Area ID in body", body.area_id)
+		data = await promisify<ScanInput, ScanOutput>(ddb.scan.bind(ddb), {
+			TableName: "reports",
+			FilterExpression: "area_id = :area_id",
+			ExpressionAttributeValues: {
+				":area_id": { S: body.area_id }
+			}
+		})
+
+		const reports = (<ScanOutput>data)
+			.Items!.sort((a, b) => +b.timestamp!.N! - +a.timestamp!.N!)
+			.map(item => ({
+				id: item.id!.S!,
+				feed_url: item.feed_url!.S!,
+				area: {
+					id: item.area!.M!.id!.S!,
+					name: item.area!.M!.name!.S!,
+					location: {
+						latitude: +item.area!.M!.location!.M!.latitude!.N!,
+						longitude: +item.area!.M!.location!.M!.longitude!.N!
+					}
+				},
+				userLocations: item.userLocations!.L!.map(ul => ({
+					latitude: +ul!.M!.latitude!.N!,
+					longitude: +ul!.M!.longitude!.N!
+				})),
+				timestamp: +item.timestamp!.N!
+			}))
+		log("Reports", reports)
+
+		return {
+			headers: {
+				"Content-Type": "application/json",
+				"Access-Control-Allow-Headers": "*",
+				"Access-Control-Allow-Origin": "*",
+				"Access-Control-Allow-Methods": "*"
+			},
+			statusCode: "200",
+			body: JSON.stringify(reports)
+		}
+	} else {
+		log("No area_id found in request body")
+		return {
+			headers: {
+				"Content-Type": "application/json",
+				"Access-Control-Allow-Headers": "*",
+				"Access-Control-Allow-Origin": "*",
+				"Access-Control-Allow-Methods": "*"
+			},
+			statusCode: "400",
+			body: JSON.stringify({
+				message: "Missing area_id in body"
+			})
+		}
+	}
+}
+
+const processData = async (area_ids: string[]) => {
+	let data: any
 
 	log("<< Looping through area_ids", { area_ids })
 	for (const area_id of area_ids) {
@@ -256,6 +295,7 @@ export const handler = async (event: S3CreateEvent | APIGatewayEvent | IotLocati
 			}
 		})
 		const userLocations = (<ScanOutput>data).Items!.map(item => ({
+			user_id: item.user_id!.S!,
 			latitude: +item.location!.M!.latitude!.N!,
 			longitude: +item.location!.M!.longitude!.N!
 		}))
@@ -284,7 +324,7 @@ export const handler = async (event: S3CreateEvent | APIGatewayEvent | IotLocati
 					{
 						Image: {
 							S3Object: {
-								Bucket: "whosthat",
+								Bucket: process.env.AWS_S3_BUCKET,
 								Name: object_key
 							}
 						}
@@ -302,17 +342,19 @@ export const handler = async (event: S3CreateEvent | APIGatewayEvent | IotLocati
 					log("Publishing to SNS topics and DynamoDB")
 					await Promise.all([
 						promisify<PublishInput, PublishResponse>(sns.publish.bind(sns), {
-							TopicArn: "arn:aws:sns:ap-southeast-1:513318141799:whosthat",
+							TopicArn: process.env.AWS_SNS_TOPIC_ARN,
 							Message: `Person detected in ${
 								area.name
-							} at ${new Date().toString()} while all authorized users' locations are away from the area! Check the image at https://whosthat.s3.amazonaws.com/${object_key}`
+							} at ${new Date().toString()} while all authorized users' locations are away from the area! Check the image at https://${
+								process.env.AWS_S3_BUCKET
+							}.s3.amazonaws.com/${object_key}`
 						}),
 						promisify<PutItemInput, PutItemOutput>(ddb.putItem.bind(ddb), {
 							TableName: "reports",
 							Item: {
 								id: { S: randomUUID() },
 								feed_url: {
-									S: `https://whosthat-0.s3.amazonaws.com/${object_key}`
+									S: `https://${process.env.AWS_S3_BUCKET}.s3.amazonaws.com/${object_key}`
 								},
 								area: {
 									M: {
@@ -329,6 +371,7 @@ export const handler = async (event: S3CreateEvent | APIGatewayEvent | IotLocati
 								user_locations: {
 									L: userLocations.map<AttributeValue>(userLocation => ({
 										M: {
+											user_id: { S: userLocation.user_id },
 											latitude: { N: userLocation.latitude + "" },
 											longitude: { N: userLocation.longitude + "" }
 										}
@@ -344,6 +387,61 @@ export const handler = async (event: S3CreateEvent | APIGatewayEvent | IotLocati
 			}
 		}
 	}
+}
+
+export const handler = async (event: S3CreateEvent | APIGatewayEvent | IotLocationEvent) => {
+	let area_ids = <string[]>[]
+
+	if ("location" in event) {
+		area_ids = await handleLocationEvent(event)
+	} else if ("Records" in event) {
+		area_ids = await handleS3CreateEvent(event)
+	} else {
+		log(">> API Gateway Event", event)
+
+		if (event.httpMethod === "OPTIONS") {
+			return {
+				headers: {
+					"Content-Type": "application/json",
+					"Access-Control-Allow-Headers": "*",
+					"Access-Control-Allow-Origin": "*",
+					"Access-Control-Allow-Methods": "*"
+				},
+				statusCode: "200",
+				body: JSON.stringify({})
+			}
+		}
+
+		let body: any = {}
+		try {
+			body = JSON.parse(event.body!) || {}
+		} catch {
+			log("Invalid JSON body", event.body)
+			body = {}
+		}
+		log("Body", body)
+
+		if ("location" in body) {
+			area_ids = await handleLocationEvent(body)
+			await processData(area_ids)
+			log("Done")
+
+			return {
+				headers: {
+					"Content-Type": "application/json",
+					"Access-Control-Allow-Headers": "*",
+					"Access-Control-Allow-Origin": "*",
+					"Access-Control-Allow-Methods": "*"
+				},
+				statusCode: "200",
+				body: JSON.stringify({})
+			}
+		} else {
+			return handleAPIGatewayEvent(body)
+		}
+	}
+
+	await processData(area_ids)
 
 	log("Done")
 }

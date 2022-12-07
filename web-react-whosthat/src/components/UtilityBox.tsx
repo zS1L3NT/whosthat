@@ -8,7 +8,7 @@ const UtilityBox = <
 	T extends {
 		id: string | number
 		primary: string | number
-		secondary?: string | number
+		secondary?: string | number | null | undefined
 	}
 >({
 	children,
@@ -73,7 +73,13 @@ const UtilityBox = <
 									primary={item.primary}
 									primaryTypographyProps={{ color: "secondary.main" }}
 									secondary={
-										"secondary" in item ? item.secondary ?? "..." : undefined
+										"secondary" in item
+											? item.secondary === null
+												? "..."
+												: item.secondary === undefined
+												? "-"
+												: item.secondary
+											: undefined
 									}
 								/>
 							</ListItemButton>

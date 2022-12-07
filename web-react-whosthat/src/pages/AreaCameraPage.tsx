@@ -66,35 +66,45 @@ const AreaCameraPage = ({}: {}) => {
 			<UtilityBox
 				title="Area Information"
 				items={[
-					{ id: 0, primary: "ID", secondary: area?.id },
-					{ id: 1, primary: "Name", secondary: area?.name },
-					{ id: 2, primary: "Latitude", secondary: area?.location.latitude },
-					{ id: 3, primary: "Longitude", secondary: area?.location.longitude }
+					{
+						id: 0,
+						primary: "ID",
+						secondary: area ? area.id : area
+					},
+					{
+						id: 1,
+						primary: "Name",
+						secondary: area ? area.name : area
+					},
+					{
+						id: 2,
+						primary: "Latitude",
+						secondary: area ? area.location.latitude : area
+					},
+					{
+						id: 3,
+						primary: "Longitude",
+						secondary: area ? area.location.longitude : area
+					}
 				]}
 			/>
 			<UtilityBox
 				title="Camera Information"
 				items={[
-					{ id: 0, primary: "ID", secondary: cameraId },
+					{
+						id: 0,
+						primary: "ID",
+						secondary: cameraId
+					},
 					{
 						id: 1,
 						primary: "Object Key",
-						secondary:
-							latestFeed === null
-								? "..."
-								: latestFeed === undefined
-								? "-"
-								: latestFeed.object_key
+						secondary: latestFeed ? latestFeed.object_key : latestFeed
 					},
 					{
 						id: 2,
 						primary: "Last Updated Feed",
-						secondary:
-							latestFeed === null
-								? "..."
-								: latestFeed === undefined
-								? "-"
-								: format(latestFeed.timestamp)
+						secondary: latestFeed ? format(latestFeed.timestamp) : latestFeed
 					}
 				]}>
 				{latestFeed ? (

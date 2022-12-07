@@ -60,47 +60,66 @@ const AreaUserPage = ({}: {}) => {
 			<UtilityBox
 				title="Area Information"
 				items={[
-					{ id: 0, primary: "ID", secondary: area?.id },
-					{ id: 1, primary: "Name", secondary: area?.name },
-					{ id: 2, primary: "Latitude", secondary: area?.location.latitude },
-					{ id: 3, primary: "Longitude", secondary: area?.location.longitude }
+					{
+						id: 0,
+						primary: "ID",
+						secondary: area ? area.id : area
+					},
+					{
+						id: 1,
+						primary: "Name",
+						secondary: area ? area.name : area
+					},
+					{
+						id: 2,
+						primary: "Latitude",
+						secondary: area ? area.location.latitude : area
+					},
+					{
+						id: 3,
+						primary: "Longitude",
+						secondary: area ? area.location.longitude : area
+					}
 				]}
 			/>
 			<UtilityBox
 				title="User Information"
 				items={[
-					{ id: 0, primary: "ID", secondary: user?.id },
-					{ id: 1, primary: "Name", secondary: user?.name },
-					{ id: 2, primary: "Email", secondary: user?.email },
+					{
+						id: 0,
+						primary: "ID",
+						secondary: user ? user.id : user
+					},
+					{
+						id: 1,
+						primary: "Name",
+						secondary: user ? user.name : user
+					},
+					{
+						id: 2,
+						primary: "Email",
+						secondary: user ? user.email : user
+					},
 					{
 						id: 3,
 						primary: "Latitude",
-						secondary:
-							latestLocation === null
-								? "..."
-								: latestLocation === undefined
-								? "-"
-								: latestLocation.location.latitude
+						secondary: latestLocation
+							? latestLocation.location.latitude
+							: latestLocation
 					},
 					{
 						id: 4,
 						primary: "Longitude",
-						secondary:
-							latestLocation === null
-								? "..."
-								: latestLocation === undefined
-								? "-"
-								: latestLocation.location.longitude
+						secondary: latestLocation
+							? latestLocation.location.longitude
+							: latestLocation
 					},
 					{
 						id: 5,
 						primary: "Last Updated Location",
-						secondary:
-							latestLocation === null
-								? "..."
-								: latestLocation === undefined
-								? "-"
-								: format(latestLocation.timestamp)
+						secondary: latestLocation
+							? format(latestLocation.timestamp)
+							: latestLocation
 					}
 				]}
 			/>

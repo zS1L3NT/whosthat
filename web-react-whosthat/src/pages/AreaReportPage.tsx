@@ -26,20 +26,40 @@ const AreaReportPage = ({}: {}) => {
 			<UtilityBox
 				title="Area Information"
 				items={[
-					{ id: 0, primary: "ID", secondary: areaId },
-					{ id: 1, primary: "Name", secondary: report?.area?.name },
-					{ id: 2, primary: "Latitude", secondary: report?.area?.location.latitude },
-					{ id: 3, primary: "Longitude", secondary: report?.area?.location.longitude }
+					{
+						id: 0,
+						primary: "ID",
+						secondary: areaId
+					},
+					{
+						id: 1,
+						primary: "Name",
+						secondary: report ? report.area.name : report
+					},
+					{
+						id: 2,
+						primary: "Latitude",
+						secondary: report ? report.area.location.latitude : report
+					},
+					{
+						id: 3,
+						primary: "Longitude",
+						secondary: report ? report.area.location.longitude : report
+					}
 				]}
 			/>
 			<UtilityBox
 				title="Report Information"
 				items={[
-					{ id: 0, primary: "ID", secondary: reportId },
+					{
+						id: 0,
+						primary: "ID",
+						secondary: reportId
+					},
 					{
 						id: 1,
 						primary: "Timestamp",
-						secondary: report ? new Date(report.timestamp).toLocaleString() : ""
+						secondary: report ? new Date(report.timestamp).toLocaleString() : report
 					}
 				]}>
 				{report?.feed_url ? (

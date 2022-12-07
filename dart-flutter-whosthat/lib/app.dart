@@ -1,6 +1,7 @@
 // ignore_for_file: import_of_legacy_library_into_null_safe, depend_on_referenced_packages
 
 import 'dart:convert';
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 
 import 'package:aws_iot_data_api/iot-data-2015-05-28.dart';
@@ -24,6 +25,7 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   dynamic report;
+  bool canPublish = false;
   bool publish = false;
 
   @override
@@ -66,16 +68,64 @@ class _AppState extends State<App> {
   }
 
   void publishLocation() async {
+    LocationPermission permission;
+
+    // Test if location services are enabled.
+    if (!(await Geolocator.isLocationServiceEnabled())) {
+      print("Location service disabled");
+      setState(() {
+        canPublish = false;
+      });
+      return Future.delayed(
+        const Duration(seconds: 5),
+        publishLocation,
+      );
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        print("Rejected location permission request");
+        setState(() {
+          canPublish = false;
+        });
+        return Future.delayed(
+          const Duration(seconds: 5),
+          publishLocation,
+        );
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      print("Location permission permanently denied");
+      setState(() {
+        canPublish = false;
+      });
+      return Future.delayed(
+        const Duration(seconds: 5),
+        publishLocation,
+      );
+    }
+
+    if (!canPublish) {
+      canPublish = true;
+      setState(() {
+        canPublish = true;
+      });
+    }
+
     try {
-      if (publish) {
+      if (canPublish && publish) {
+        final location = await Geolocator.getCurrentPosition();
         await widget.iot.publish(
           topic: "location",
           payload: Uint8List.fromList(
             jsonEncode({
               "user_id": "d8097ad2-fcfa-4846-a166-64ab94435ccf",
               "location": {
-                "latitude": 0,
-                "longitude": 0,
+                "latitude": location.latitude,
+                "longitude": location.longitude,
               },
             }).codeUnits,
           ),
@@ -156,11 +206,13 @@ class _AppState extends State<App> {
               ),
             ),
             ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  publish = !publish;
-                });
-              },
+              onPressed: canPublish
+                  ? () {
+                      setState(() {
+                        publish = !publish;
+                      });
+                    }
+                  : null,
               child: Text(
                 publish ? "Disable Location Publishing" : "Enable Location Publishing",
               ),

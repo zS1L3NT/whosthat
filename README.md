@@ -14,6 +14,20 @@ If all users are outside the area AND there are people detected in the camera fe
 
 I need a deliverable for my school subject called IoT Application Development (ITAD)
 
+## Subprojects
+
+### `dart-flutter-whosthat`
+
+This is the the Flutter app that runs on the user's device as the IoT Device
+
+### `ts-lambda-whosthat`
+
+This is the AWS Lambda function's code
+
+### `web-react-whosthat`
+
+This is the React frontend testing dashboard built for the live demonstration of WhosThat
+
 ## Usage
 
 ### Setup the AWS Project

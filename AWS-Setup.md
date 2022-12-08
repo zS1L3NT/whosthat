@@ -53,7 +53,7 @@
 **Function name**: `whosthat`<br>
 **Runtime**: `Node.js 16.x`<br>
 **Architecture**: `x86_64`<br>
-**Execution role**: `Use an existing role`
+**Execution role**: `Use an existing role`<br>
 **Existing role**: [`whosthat`](#role)
 
 ### Triggers
@@ -72,8 +72,8 @@
 
 ### Code
 
-[`distancediff.js`](./ts-lambda-whosthat/src/distancediff.js)<br>
-[`index.js`](./ts-lambda-whosthat/src/index.js)
+[`distancediff.js`](ts-lambda-whosthat/src/distancediff.js)<br>
+[`index.js`](ts-lambda-whosthat/src/index.js)
 
 ### Test
 
@@ -96,6 +96,10 @@
     	}
     }
     ```
+
+## Environment Variables
+
+[ts-lambda-whosthat/.env.example](ts-lambda-whosthat/.env.example)
 
 # S3
 

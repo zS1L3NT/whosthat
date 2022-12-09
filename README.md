@@ -18,15 +18,15 @@ I need a deliverable for my school subject called IoT Application Development (I
 
 ## Subrepositories
 
-### `dart-flutter-whosthat`
+### [`dart-flutter-whosthat`](dart-flutter-whosthat)
 
 This is the the Flutter app that runs on the user's device as the IoT Device
 
-### `ts-lambda-whosthat`
+### [`ts-lambda-whosthat`](ts-lambda-whosthat)
 
 This is the AWS Lambda function's code
 
-### `web-react-whosthat`
+### [`web-react-whosthat`](web-react-whosthat)
 
 This is the React frontend testing dashboard built for the live demonstration of WhosThat
 

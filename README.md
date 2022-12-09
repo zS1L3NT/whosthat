@@ -16,7 +16,7 @@ If all users are outside the area AND there are people detected in the camera fe
 
 I need a deliverable for my school subject called IoT Application Development (ITAD)
 
-## Subprojects
+## Subrepositories
 
 ### `dart-flutter-whosthat`
 

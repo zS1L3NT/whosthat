@@ -10,6 +10,8 @@ If one of the cameras detect motion, it will capture the current camera feed and
 
 If all users are outside the area AND there are people detected in the camera feed, SNS will send an email to a registered email address to alert them of unauthorized precense in the area. The Lambda will also capture all the information and upload it to DynamoDB for tracking purposes.
 
+![WhosThat Cloud Architecture Diagram](https://res.cloudinary.com/zs1l3nt/image/upload/repositories/whosthat/diagram.png)
+
 ## Motivation
 
 I need a deliverable for my school subject called IoT Application Development (ITAD)

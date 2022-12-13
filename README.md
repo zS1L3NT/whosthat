@@ -71,17 +71,18 @@ $ npm run dev
     -   Rekognition
 -   Lambda
     -   TypeScript
-        -   [![@types/aws-lambda](https://img.shields.io/github/package-json/dependency-version/zS1L3NT/whosthat/dev/@types/aws-lambda?style=flat-square&filename=ts-lambda-whosthat%2Fpackage.json)](https://npmjs.com/package/@types/aws-lambda)
-        -   [![@types/node](https://img.shields.io/github/package-json/dependency-version/zS1L3NT/whosthat/dev/@types/node?style=flat-square&filename=ts-lambda-whosthat%2Fpackage.json)](https://npmjs.com/package/@types/node)
-        -   [![ts-node](https://img.shields.io/github/package-json/dependency-version/zS1L3NT/whosthat/dev/ts-node?style=flat-square&filename=ts-lambda-whosthat%2Fpackage.json)](https://npmjs.com/package/ts-node)
-        -   [![typescript](https://img.shields.io/github/package-json/dependency-version/zS1L3NT/whosthat/dev/typescript?style=flat-square&filename=ts-lambda-whosthat%2Fpackage.json)](https://npmjs.com/package/typescript)
+        -   [![@types/aws-lambda](https://img.shields.io/badge/%40types%2Faws--lambda-%5E8.10.108-red?style=flat-square)](https://npmjs.com/package/@types/aws-lambda/v/8.10.108)
+        -   [![@types/node](https://img.shields.io/badge/%40types%2Fnode-latest-red?style=flat-square)](https://npmjs.com/package/@types/node/v/latest)
+        -   [![ts-node](https://img.shields.io/badge/ts--node-latest-red?style=flat-square)](https://npmjs.com/package/ts-node/v/latest)
+        -   [![typescript](https://img.shields.io/badge/typescript-latest-red?style=flat-square)](https://npmjs.com/package/typescript/v/latest)
     -   AWS SDK
-        -   [![aws-lambda](https://img.shields.io/github/package-json/dependency-version/zS1L3NT/whosthat/aws-lambda?style=flat-square&filename=ts-lambda-whosthat%2Fpackage.json)](https://npmjs.com/package/aws-lambda)
-        -   [![aws-sdk](https://img.shields.io/github/package-json/dependency-version/zS1L3NT/whosthat/aws-sdk?style=flat-square&filename=ts-lambda-whosthat%2Fpackage.json)](https://npmjs.com/package/aws-sdk)
+        -   [![aws-lambda](https://img.shields.io/badge/aws--lambda-%5E1.0.7-red?style=flat-square)](https://npmjs.com/package/aws-lambda/v/1.0.7)
+        -   [![aws-sdk](https://img.shields.io/badge/aws--sdk-%5E2.1258.0-red?style=flat-square)](https://npmjs.com/package/aws-sdk/v/2.1258.0)
 -   Flutter
     -   AWS SDK
         -   [![aws_iot_data_api](https://img.shields.io/badge/aws__iot__data__api-%5E0.2.0-blue?style=flat-square)](https://pub.dev/packages/aws_iot_data_api/versions/0.2.0)
     -   Miscellaneous
+        -   [![flutter_lints](https://img.shields.io/badge/flutter__lints-%5E2.0.0-blue?style=flat-square)](https://pub.dev/packages/flutter_lints/versions/2.0.0)
         -   [![geolocator](https://img.shields.io/badge/geolocator-%5E9.0.2-blue?style=flat-square)](https://pub.dev/packages/geolocator/versions/9.0.2)
         -   [![http](https://img.shields.io/badge/http-%5E0.12.0-blue?style=flat-square)](https://pub.dev/packages/http/versions/0.12.0)
         -   [![timeago](https://img.shields.io/badge/timeago-%5E3.2.2-blue?style=flat-square)](https://pub.dev/packages/timeago/versions/3.2.2)
